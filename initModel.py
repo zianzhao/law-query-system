@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
-from gensim import corpora, models
+from gensim import corpora, models, similarities
 
 import sys
 stdout = sys.stdout
@@ -17,6 +17,16 @@ Purpose: create corpus and lsimodel based on existing data
 Author: : Zian Zhao
 
 Version: 1.0 3.6,1017
+'''
+
+'''
+Module name: initModel
+
+Revision: store the similarity matrix
+
+Author: : Zian Zhao
+
+Version: 1.1 3.7,1017
 '''
 
 # get the corpus
@@ -40,4 +50,8 @@ corpora.MmCorpus.serialize('cases.mm', corpus)
 # create and save the LSI model
 lsi_model = models.LsiModel(corpus, id2word=dictionary)
 lsi_model.save('lsi.model')
+
+# create the similar matrix
+index = similarities.MatrixSimilarity(lsi_model[corpus])
+index.save('sims.index')
 
