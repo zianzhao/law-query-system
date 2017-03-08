@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*
 
 from gensim import corpora, models, similarities
-from jieba import *
+import jieba.posseg as pseg
 # import time
 
 import sys
@@ -19,6 +19,16 @@ Purpose: find the most similar case according to the description
 Author: : Zian Zhao
 
 Version: 1.0 3.7,1017
+'''
+
+'''
+Module name: similarity
+
+Revision: delete the named entity
+
+Author: : Zian Zhao
+
+Version: 1.1 3.8,1017
 '''
 # tic = time.time()
 # load the model, corpus and dictionary
@@ -38,13 +48,30 @@ for i in range(len(texts)):
     texts[i] = texts[i].split()
 infile.close()
 
-intext = "输入的描述"
-seg = set(lcut_for_search(intext)) - set(stopword)
+intext = "张茹轩和一二三离婚"
+words = list(set(pseg.cut(intext)))
+for i in range(len(words)):
+    if words[i].flag[:2] == 'nr':
+        if 1 < len(words[i].word) < 5:
+            words[i] = 0
+    else:
+        pos = str(words[i]).index('/')
+        words[i] = str(words[i])[:pos]
+
+while True:
+    try:
+        words.remove(0)
+    except:
+        break
+
+seg = set(words) - set(stopword)
+
 tmp_text = ""
 for word in seg:
     if (word != '   ') and (word != '\r') and (word != '\t') and (word != ' '):
         tmp_text += (str(word) + ' ')
 
+print tmp_text
 if len(tmp_text.split()):
 
     # toc1 = time.time()
