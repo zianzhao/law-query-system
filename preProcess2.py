@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-import sys
-from jieba import *
+
+import jieba.posseg as pseg
 import pymysql as mysql
 
 '''----------------------------------------------------------------------------
@@ -22,11 +22,11 @@ Set default code
 Description: set default code as utf-8
 Author: ZRX
 ----------------------------------------------------------------------------'''
+import sys
 stdout = sys.stdout
 reload(sys)
 sys.stdout = stdout
 sys.setdefaultencoding('utf-8')
-
 
 '''----------------------------------------------------------------------------------
 fenci
@@ -56,11 +56,36 @@ Zhao Zian
 Rev. 2.1 2.22,2017
 ----------------------------------------------------------------------------------'''
 
+'''----------------------------------------------------------------------------------
+fenci
+
+Revision: delete the named entity in text
+
+Author:
+Zhao Zian
+Rev. 2.2 2.22,2017
+----------------------------------------------------------------------------------'''
+
 
 def fenci(intext, stopword, file_id):
     outtext = "%d " % file_id
     # tokenize and delete the stop word
-    seg = set(lcut_for_search(intext)) - set(stopword)
+    words = list(set(pseg.cut(intext)))
+    for i in range(len(words)):
+        if words[i].flag[:2] == 'nr':
+            if 1 < len(words[i].word) < 5:
+                words[i] = 0
+        else:
+            pos = str(words[i]).index('/')
+            words[i] = str(words[i])[:pos]
+
+    while True:
+        try:
+            words.remove(0)
+        except:
+            break
+
+    seg = set(words) - set(stopword)
     for word in seg:
         if (word != u'\n') and (word != u'\r') and (word != u'\t') and (word != ' '):
             outtext += (str(word) + ' ')
