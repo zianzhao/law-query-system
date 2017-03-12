@@ -3,7 +3,7 @@
 
 from gensim import corpora, models, similarities
 import jieba.posseg as pseg
-# import time
+import time
 
 import sys
 stdout = sys.stdout
@@ -30,16 +30,20 @@ Author: : Zian Zhao
 
 Version: 1.1 3.8,1017
 '''
-# tic = time.time()
+tic = time.time()
 # load the model, corpus and dictionary
 lsi_model = models.LsiModel.load('lsi.model', mmap='r')
 dictionary = corpora.Dictionary.load('dictionary.dict')
 corpus = corpora.MmCorpus('cases.mm')
 
+print time.time()-tic
+
 # get the stopword list
 words = open('stopword_origin.txt', 'r')
 stopword = words.read()
 words.close()
+
+print time.time()-tic
 
 # get the corpus
 infile = open('texts.txt', 'r')
@@ -48,7 +52,14 @@ for i in range(len(texts)):
     texts[i] = texts[i].split()
 infile.close()
 
-intext = "张茹轩和一二三离婚"
+print time.time()-tic
+
+# load the index
+index = similarities.MatrixSimilarity.load('sims.index')
+
+print time.time()-tic
+
+intext = "ABC和一二三离婚,暴力倾向，有精神病史"
 words = list(set(pseg.cut(intext)))
 for i in range(len(words)):
     if words[i].flag[:2] == 'nr':
@@ -71,18 +82,13 @@ for word in seg:
     if (word != '   ') and (word != '\r') and (word != '\t') and (word != ' '):
         tmp_text += (str(word) + ' ')
 
-print tmp_text
 if len(tmp_text.split()):
 
-    # toc1 = time.time()
-    # print toc1-tic
     vec_bow = dictionary.doc2bow(tmp_text.lower().split())
     vec_lsi = lsi_model[vec_bow]
-    index = similarities.MatrixSimilarity.load('sims.index')
     sims = index[vec_lsi]
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    # toc2 = time.time()
-    # print toc2 - tic
+
     if sims[0][1] < 0.5:
         print sims[0][1]
         print "Similar file does not exist in the database."
@@ -94,5 +100,6 @@ if len(tmp_text.split()):
             if count > 20:
                 break
 
+print time.time()-tic
 
 
