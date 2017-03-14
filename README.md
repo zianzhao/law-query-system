@@ -1,6 +1,4 @@
-# huanghuang
+Law Query System
 
-another huanghuang
-
-a third huanghuang
+A system built to find out the closest related law cases 
 
